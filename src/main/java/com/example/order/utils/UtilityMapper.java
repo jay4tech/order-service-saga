@@ -8,13 +8,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 
 public class UtilityMapper {
-    public static Order responseToModel(String json)  {
-        try {
-            return getMapper().readValue(json, Order.class);
-        } catch (JsonProcessingException e) {
-            return null;
-        }
-    }
+
     public static String getJsonString(Order json) {
         try {
             return getMapper().writeValueAsString(json);

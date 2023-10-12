@@ -1,6 +1,8 @@
 package com.example.order.service;
 
+import com.example.order.client.InventoryClient;
 import com.example.order.entity.Order;
+import com.example.order.model.Inventory;
 import com.example.order.repository.OrderRepository;
 import com.example.order.utils.MessageSender;
 import com.example.order.utils.UtilityMapper;
@@ -14,6 +16,9 @@ public class OrderService implements IOrderService{
 
     @Autowired
     OrderRepository orderRepository;
+
+    @Autowired
+    InventoryClient inventoryClient;
 
     @Autowired
     MessageSender messageSender;
@@ -34,9 +39,14 @@ public class OrderService implements IOrderService{
 
     @Override
     public Order createOrders(Order order) {
-        Order savedOrder = orderRepository.save(order);
-        messageSender.send(UtilityMapper.getJsonString(savedOrder));
-        return savedOrder;
+        Long productId = order.getProductId();
+        Inventory inventory = inventoryClient.getInventoryProductId(productId);
+        if(inventory!=null) {
+            Order savedOrder = orderRepository.save(order);
+            messageSender.sendInventoryEvent(UtilityMapper.getJsonString(savedOrder));
+            return savedOrder;
+        }
+        return order;
     }
 
     @Override

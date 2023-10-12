@@ -12,10 +12,10 @@ public class MessageSender {
     @Autowired
     private RabbitTemplate rabbitTemplate;
     @Autowired
-    @Qualifier("queuePayment")
-    private Queue queuePayment;
+    @Qualifier("queueInventory")
+    private Queue queueInventory;
 
-    public void send(String message) {
-        rabbitTemplate.convertAndSend(queuePayment.getName(), message);
+    public void sendInventoryEvent(String message) {
+        rabbitTemplate.convertAndSend(queueInventory.getName(), message);
     }
 }
