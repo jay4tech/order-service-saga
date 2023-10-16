@@ -18,4 +18,6 @@ public class Order {
     private Long quantity;
     private Long totalAmount;
     private String email;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 }

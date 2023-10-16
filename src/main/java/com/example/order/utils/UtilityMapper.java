@@ -1,6 +1,7 @@
 package com.example.order.utils;
 
 import com.example.order.entity.Order;
+import com.example.order.model.Payment;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,5 +22,12 @@ public class UtilityMapper {
         mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return mapper;
+    }
+    public static Payment responseToModel(String json)  {
+        try {
+            return getMapper().readValue(json, Payment.class);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
     }
 }

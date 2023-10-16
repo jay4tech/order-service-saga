@@ -2,7 +2,10 @@ package com.example.order.service;
 
 import com.example.order.client.InventoryClient;
 import com.example.order.entity.Order;
+import com.example.order.entity.OrderStatus;
 import com.example.order.model.Inventory;
+import com.example.order.model.Payment;
+import com.example.order.model.PaymentStatus;
 import com.example.order.repository.OrderRepository;
 import com.example.order.utils.MessageSender;
 import com.example.order.utils.UtilityMapper;
@@ -12,7 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class OrderService implements IOrderService{
+public class OrderService implements IOrderService {
 
     @Autowired
     OrderRepository orderRepository;
@@ -31,7 +34,7 @@ public class OrderService implements IOrderService{
     @Override
     public void updateOrder(Order order) {
         Order orderDb = orderRepository.findById(order.getId()).orElse(null);
-        if(orderDb !=null) {
+        if (orderDb != null) {
             order.setId(orderDb.getId());
             orderRepository.save(order);
         }
@@ -41,7 +44,7 @@ public class OrderService implements IOrderService{
     public Order createOrders(Order order) {
         Long productId = order.getProductId();
         Inventory inventory = inventoryClient.getInventoryProductId(productId);
-        if(inventory!=null) {
+        if (inventory != null) {
             Order savedOrder = orderRepository.save(order);
             messageSender.sendInventoryEvent(UtilityMapper.getJsonString(savedOrder));
             return savedOrder;
@@ -57,5 +60,17 @@ public class OrderService implements IOrderService{
     @Override
     public Order getOrder(Long id) {
         return orderRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public void updateOrder(Payment payment) {
+        Order orderDb = orderRepository.findById(payment.getOrderId()).orElse(null);
+        if (orderDb != null) {
+            if (payment.getStatus().equals(PaymentStatus.SUCCESS))
+                orderDb.setStatus(OrderStatus.SUCCESS);
+            else if (payment.getStatus().equals(PaymentStatus.FAILED))
+                orderDb.setStatus(OrderStatus.FAILED);
+            orderRepository.save(orderDb);
+        }
     }
 }
